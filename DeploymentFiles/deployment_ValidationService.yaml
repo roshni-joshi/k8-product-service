@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: validation-service
+  name: validation-service-deployment
+  namespace: csci5409
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: validation-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: validation-service
+    spec:
+      containers:
+      - image: northamerica-northeast1-docker.pkg.dev/csci5409-k8-417419/csci5409-k8-registry/validation-service-image:v1
+        imagePullPolicy: Always
+        name: validation-service-container
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/roshni_PV_dir"
+          name: csci5409-k8-validation-service-pv
+      restartPolicy: Always
+      volumes:
+      - name: csci5409-k8-validation-service-pv
+        persistentVolumeClaim:
+          claimName: csci5409-k8-pvc
+  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: validation-service
+  name: validation-k8-service
+  namespace: csci5409
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: validation-service
+  type: LoadBalancer

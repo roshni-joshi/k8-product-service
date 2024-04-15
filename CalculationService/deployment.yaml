@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: calculation-service
+  name: calculation-service-deployment
+  namespace: csci5409
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calculation-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: calculation-service
+    spec:
+      containers:
+      - image: northamerica-northeast1-docker.pkg.dev/csci5409-k8-417419/csci5409-k8-registry/calculation-service-image:v1
+        imagePullPolicy: Always
+        name: calculation-service-container
+        ports:
+        - containerPort: 7070
+        volumeMounts:
+        - mountPath: "/roshni_PV_dir"
+          name: csci5409-k8-calculation-service-pv
+      restartPolicy: Always
+      volumes:
+      - name: csci5409-k8-calculation-service-pv
+        persistentVolumeClaim:
+          claimName: csci5409-k8-pvc
+  
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: calculation-service
+  name: calculation-k8-service
+  namespace: csci5409
+spec:
+  ports:
+  - port: 7070
+    protocol: TCP
+    targetPort: 7070
+  selector:
+    app: calculation-service

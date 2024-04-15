@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: csci5409
+  
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: csci5409-k8-pv
+  namespace: csci5409
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/roshni_PV_dir"
+    
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: csci5409-k8-pvc
+  namespace: csci5409
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

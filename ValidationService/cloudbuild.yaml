@@ -1,0 +1,23 @@
+steps:
+  - name: 'gcr.io/cloud-builders/mvn' 
+    args: ['clean', 'install']
+   
+  - name: 'gcr.io/cloud-builders/docker' 
+    args: ['build', '-t', 'northamerica-northeast1-docker.pkg.dev/csci5409-k8-417419/csci5409-k8-registry/validation-service-image:v1', '.']
+    
+  - name: 'gcr.io/cloud-builders/docker' 
+    args: ['push', 'northamerica-northeast1-docker.pkg.dev/csci5409-k8-417419/csci5409-k8-registry/validation-service-image:v1']
+    
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'persistentvolume.yaml']
+    env: 
+      - 'CLOUDSDK_COMPUTE_ZONE=northamerica-northeast1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=csci5409-k8-cluster'
+      - 'CLOUDSDK_CORE_PROJECT=csci5409-k8-417419'
+   
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'deployment.yaml']
+    env: 
+      - 'CLOUDSDK_COMPUTE_ZONE=northamerica-northeast1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=csci5409-k8-cluster'
+      - 'CLOUDSDK_CORE_PROJECT=csci5409-k8-417419'
